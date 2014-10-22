@@ -1,0 +1,10 @@
+#!/bin/bash
+#PBS -l walltime=100:00:00,mem=20gb,nodes=1:ppn=3
+#######################################################################
+
+hostname
+cd /home/mazin/hpr_ds3/mapping/all.together/sajr/orthAnn/onOrthIntrons
+fa=(hg38 panTro4 rheMac3)
+s=(hs pt rm)
+java -Xmx10g -jar sajr.jar annotate -in=../../../${s[$PBS_ARRAYID]}/accepted_hits.bam -ann_out=${s[$PBS_ARRAYID]}.gff -fasta=../../../../../index/${fa[$PBS_ARRAYID]}.fa -id_prefix=${s[$PBS_ARRAYID]} -forced_intron_set=../introns/${s[$PBS_ARRAYID]}.orth.intron
+

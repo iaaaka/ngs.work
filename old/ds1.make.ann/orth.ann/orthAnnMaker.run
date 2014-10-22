@@ -1,0 +1,7 @@
+#!/bin/bash
+#PBS -l walltime=100:00:00,mem=10gb,nodes=1:ppn=1
+#######################################################################
+
+cd /home/mazin/hpr_ds3/mapping/all.together/sajr/orthAnn
+java -jar orthAnnMaker.jar print.introns ../liftover/out/intersects/all.sites ../hs.gff ../pt.gff ../rm.gff 1 ./introns/
+#java -jar orthAnnMaker.jar ../liftover/out/intersects/all.sites ../hs.gff ../pt.gff ../rm.gff 1 ./

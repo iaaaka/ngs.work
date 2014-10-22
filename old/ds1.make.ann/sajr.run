@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -l walltime=100:00:00,mem=20gb,nodes=1:ppn=2
+#######################################################################
+
+hostname
+cd /home/mazin/hpr_ds3/mapping/all.together/sajr
+fa=(hg38 panTro4 rheMac3)
+s=(hs pt rm)
+java -Xmx10000m -jar sajr.jar annotate -in=../${s[$PBS_ARRAYID]}/accepted_hits.bam -ann_out=${s[$PBS_ARRAYID]}_rep.gff -fasta=../../../index/${fa[$PBS_ARRAYID]}.fa -id_prefix=${s[$PBS_ARRAYID]}
+#java -jar sajr.jar sajrcomp -comp_ann1=hs.gff -comp_ann2=/home/mazin/hpr_ds3/index/ucsc.genes/hg38.ensamble76.from.ucsc.sajr -comp_out=hs.comp
+#java -jar sajr.jar sajrcomp -comp_ann1=pt.gff -comp_ann2=/home/mazin/hpr_ds3/index/ucsc.genes/panTro4.ensamble.from.ucsc.sajr -comp_out=pt.comp
+#java -jar sajr.jar sajrcomp -comp_ann1=rm.gff -comp_ann2=/home/mazin/hpr_ds3/index/ucsc.genes/rheMac3.refSeq.from.ucsc.no_dup.sajr -comp_out=rm.comp

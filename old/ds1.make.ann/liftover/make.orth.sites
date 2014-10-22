@@ -1,0 +1,43 @@
+#!/bin/bash
+#PBS -l walltime=100:00:00,mem=10gb,nodes=1:ppn=1
+#######################################################################
+
+cd /home/mazin/hpr_ds3/mapping/all.together/sajr/liftover
+# make sites
+rm -r in out
+
+mkdir in
+cat ../hs.gff | ./scripts/extract.spl.sites.pl hs | sort | uniq > in/hs.sites.gff
+cat ../pt.gff | ./scripts/extract.spl.sites.pl pt | sort | uniq > in/pt.sites.gff
+cat ../rm.gff | ./scripts/extract.spl.sites.pl rm | sort | uniq > in/rm.sites.gff
+
+# liftover
+mkdir out
+mkdir out/unmapped
+mkdir out/intersects
+
+./scripts/liftover.run hs pt rm
+./scripts/liftover.run pt rm hs
+./scripts/liftover.run rm hs pt
+
+
+# make intersect
+./scripts/intersect.pl in/hs.sites.gff out/hs.rm.pt.hs out/hs.pt.rm.hs > out/intersects/hs.on.hs
+./scripts/intersect.pl out/hs.pt out/hs.rm.pt > out/intersects/hs.on.pt
+./scripts/intersect.pl out/hs.rm out/hs.pt.rm > out/intersects/hs.on.rm
+
+./scripts/intersect.pl in/pt.sites.gff out/pt.rm.hs.pt out/pt.hs.rm.pt > out/intersects/pt.on.pt
+./scripts/intersect.pl out/pt.hs out/pt.rm.hs > out/intersects/pt.on.hs
+./scripts/intersect.pl out/pt.rm out/pt.hs.rm > out/intersects/pt.on.rm
+
+./scripts/intersect.pl in/rm.sites.gff out/rm.pt.hs.rm out/rm.hs.pt.rm > out/intersects/rm.on.rm
+./scripts/intersect.pl out/rm.pt out/rm.hs.pt > out/intersects/rm.on.pt
+./scripts/intersect.pl out/rm.hs out/rm.pt.hs > out/intersects/rm.on.hs
+
+./scripts/sites.links.species.pl out/intersects/hs.on.hs out/intersects/hs.on.pt out/intersects/hs.on.rm  > out/intersects/hs.all
+./scripts/sites.links.species.pl out/intersects/pt.on.hs out/intersects/pt.on.pt out/intersects/pt.on.rm  > out/intersects/pt.all
+./scripts/sites.links.species.pl out/intersects/rm.on.hs out/intersects/rm.on.pt out/intersects/rm.on.rm  > out/intersects/rm.all
+
+# merge
+cd out/intersects
+cat hs.all pt.all rm.all | grep -vP 'id\ttype\ths\tpt\trm' | cut -f2-5 | sort | uniq > all.sites
